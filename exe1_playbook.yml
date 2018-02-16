@@ -1,0 +1,28 @@
+---
+- hosts: local
+  become: true
+#  vars:
+#    docker_logs: /etc/docker/deamon.json
+  tasks:
+    - name: Update cache
+      apt: update_cache=yes
+
+    - name: Install Docker
+      apt: name=docker.io state=latest
+      notify: Setup Logging
+
+
+
+  handlers:
+    - name: Setup Logging
+      blockinfile: 
+        path: /etc/docker/deamon.json
+        block: |
+            {
+              "log-driver": "syslog"
+            }
+        state: present 
+        create: yes
+        owner: root
+        mode: u=rw,g=r,o=r
+
